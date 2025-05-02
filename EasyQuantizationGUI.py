@@ -26,7 +26,7 @@ def scroll_entry_to_end(entry):
     entry.xview_moveto(1)
 
 def browse_file(entry):
-    file_path = filedialog.askopenfilename(filetypes=[("Model files", "*.safetensors *.sft")])
+    file_path = filedialog.askopenfilename(filetypes=[("Model files", "*.safetensors *.gguf *.sft")])
     if file_path:
         file_path = file_path.replace('\\', '/')  # Ensure forward slashes
         entry.delete(0, tk.END)
@@ -102,6 +102,11 @@ def run_llama_quantize():
         messagebox.showerror("Error", "Please select both input and output files.")
         return
     
+    # Check if input and output files are the same
+    if os.path.abspath(input_file) == os.path.abspath(output_file):
+        messagebox.showerror("Error", "Input and output files cannot be the same.")
+        return
+
     output_dir = os.path.dirname(output_file)
     required_space = 40_000_000_000  # ~40 GB (a bit more than 36.5 GB)
     available_space = shutil.disk_usage(output_dir).free
@@ -116,61 +121,95 @@ def run_llama_quantize():
     
     # Clear previous log
     process_text.delete('1.0', tk.END)
-    process_text.insert(tk.END, "Starting conversion process...\n")
-    process_text.see(tk.END)
     root.update()
 
-    # Convert the input file to GGUF format
-    convert_py_path = resource_path("convert.py")
-    output_dir = os.path.dirname(output_file)
-    temp_gguf_file = os.path.join(output_dir, "temporary_file_during_quantization")
+    is_input_gguf = input_file.lower().endswith(".gguf")
+    temp_gguf_file = None # Initialize temp_gguf_file
 
-    # Add cleanup of existing temp file
-    if os.path.exists(temp_gguf_file):
-        try:
-            os.remove(temp_gguf_file)
-            process_text.insert(tk.END, "Cleaned up existing temporary file.\n")
-            process_text.see(tk.END)
-            root.update()
-        except Exception as e:
-            process_text.insert(tk.END, f"Error cleaning up temporary file: {e}\n")
-            process_text.see(tk.END)
-            root.update()
-            enable_ui()
-            return
-
-    try:
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        startupinfo.wShowWindow = subprocess.SW_HIDE
-
-        # Get the Python executable path from the current environment
-        pythonpath = sys.executable
-        
-        process = subprocess.Popen([pythonpath, convert_py_path, "--src", input_file, "--dst", temp_gguf_file], 
-                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, 
-                                   bufsize=1, universal_newlines=True, startupinfo=startupinfo)
-        
-        for line in process.stdout:
-            process_text.insert(tk.END, line)
-            process_text.see(tk.END)
-            root.update()
-        
-        process.wait()
-        if process.returncode != 0:
-            raise subprocess.CalledProcessError(process.returncode, process.args)
-        
-        process_text.insert(tk.END, "Conversion completed successfully.\n")
-    except subprocess.CalledProcessError as e:
-        process_text.insert(tk.END, f"Error converting file: {e}\n")
-        process_text.insert(tk.END, f"Command: {e.cmd}\n")
-        process_text.insert(tk.END, f"Return code: {e.returncode}\n")
+    if not is_input_gguf:
+        process_text.insert(tk.END, "Starting conversion process (Safetensors/SFT -> GGUF)...\n")
         process_text.see(tk.END)
         root.update()
-        enable_ui()
-        return
 
-    # Quantize the converted file
+        # Convert the input file to GGUF format
+        convert_py_path = resource_path("convert.py")
+        output_dir = os.path.dirname(output_file)
+        # Use a more descriptive temporary file name based on the output file
+        output_name, _ = os.path.splitext(os.path.basename(output_file))
+        temp_gguf_file = os.path.join(output_dir, f"{output_name}_temp_conversion.gguf")
+
+
+        # Add cleanup of existing temp file
+        if os.path.exists(temp_gguf_file):
+            try:
+                os.remove(temp_gguf_file)
+                process_text.insert(tk.END, "Cleaned up existing temporary file.\n")
+                process_text.see(tk.END)
+                root.update()
+            except Exception as e:
+                process_text.insert(tk.END, f"Error cleaning up temporary file: {e}\n")
+                process_text.see(tk.END)
+                root.update()
+                enable_ui()
+                return
+
+        try:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+
+            # Get the Python executable path from the current environment
+            pythonpath = sys.executable
+            
+            process = subprocess.Popen([pythonpath, convert_py_path, "--src", input_file, "--dst", temp_gguf_file], 
+                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, 
+                                       bufsize=1, universal_newlines=True, startupinfo=startupinfo)
+            
+            for line in process.stdout:
+                process_text.insert(tk.END, line)
+                process_text.see(tk.END)
+                root.update()
+            
+            process.wait()
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, process.args)
+            
+            process_text.insert(tk.END, "Conversion completed successfully.\n")
+            process_text.see(tk.END)
+            root.update()
+
+        except subprocess.CalledProcessError as e:
+            process_text.insert(tk.END, f"Error converting file: {e}\n")
+            process_text.insert(tk.END, f"Command: {e.cmd}\n")
+            process_text.insert(tk.END, f"Return code: {e.returncode}\n")
+            process_text.see(tk.END)
+            root.update()
+            # Clean up the temporary file even if conversion fails
+            if temp_gguf_file and os.path.exists(temp_gguf_file):
+                os.remove(temp_gguf_file)
+            enable_ui()
+            return
+        except Exception as e: # Catch other potential errors during conversion
+            process_text.insert(tk.END, f"An unexpected error occurred during conversion: {e}\n")
+            process_text.see(tk.END)
+            root.update()
+            if temp_gguf_file and os.path.exists(temp_gguf_file):
+                os.remove(temp_gguf_file)
+            enable_ui()
+            return
+        
+        # --- End of conversion block ---
+    else:
+         process_text.insert(tk.END, "Input is already GGUF. Skipping conversion step.\n")
+         process_text.see(tk.END)
+         root.update()
+         # If input is GGUF, llama-quantize will read directly from it
+         quantize_input_file = input_file
+
+    # Determine the input file for the quantization step
+    quantize_input_file = temp_gguf_file if temp_gguf_file else input_file
+
+    # Quantize the file (either the temporary one or the original GGUF)
     llama_quantize_path = resource_path("llama-quantize.exe")
     process_text.insert(tk.END, "Starting quantization process...\n")
     process_text.see(tk.END)
@@ -181,7 +220,8 @@ def run_llama_quantize():
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
 
-        process = subprocess.Popen([llama_quantize_path, temp_gguf_file, output_file, quantize_level], 
+        # Use quantize_input_file determined above
+        process = subprocess.Popen([llama_quantize_path, quantize_input_file, output_file, quantize_level], 
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, 
                                    bufsize=1, universal_newlines=True, startupinfo=startupinfo)
         
@@ -192,6 +232,9 @@ def run_llama_quantize():
         
         process.wait()
         if process.returncode != 0:
+            # If quantization failed and we used a temp file, report the temp file name
+            if temp_gguf_file:
+                 process_text.insert(tk.END, f"Quantization command failed on temporary file: {temp_gguf_file}\n")
             raise subprocess.CalledProcessError(process.returncode, process.args)
         
         process_text.insert(tk.END, "Quantization completed successfully.\n")
@@ -201,12 +244,24 @@ def run_llama_quantize():
         process_text.insert(tk.END, f"Return code: {e.returncode}\n")
         process_text.see(tk.END)
         root.update()
+    except Exception as e: # Catch other potential errors during quantization
+        process_text.insert(tk.END, f"An unexpected error occurred during quantization: {e}\n")
+        process_text.see(tk.END)
+        root.update()
     finally:
-        # Clean up the temporary file
-        if os.path.exists(temp_gguf_file):
-            os.remove(temp_gguf_file)
+        # Clean up the temporary file if it was created
+        if temp_gguf_file and os.path.exists(temp_gguf_file):
+            try:
+                os.remove(temp_gguf_file)
+                process_text.insert(tk.END, "Cleaned up temporary conversion file.\n")
+                process_text.see(tk.END)
+                root.update()
+            except Exception as e:
+                 process_text.insert(tk.END, f"Error cleaning up temporary file {temp_gguf_file}: {e}\n")
+                 process_text.see(tk.END)
+                 root.update()
         
-    process_text.insert(tk.END, "Quantization process completed.")
+    process_text.insert(tk.END, "Process finished.\n") # Changed message slightly
     process_text.see(tk.END)
     root.update()
     

@@ -30,7 +30,7 @@ ACCENT2   = "#7c3aed"
 SUCCESS   = "#059669"
 WARNING   = "#b45309"
 DANGER    = "#dc2626"
-TEXT      = "#0f1724"
+TEXT      = "#1d283b"
 TEXT_MUTED= "#475569"
 TEXT_DIM  = "#64748b"
 WHITE     = "#ffffff"
@@ -91,21 +91,40 @@ def make_entry(parent, **kwargs):
     )
     return e
 
-def make_button(parent, text, command, color=ACCENT, fg=TEXT, width=None, font=None):
+def make_button(parent, text, command, color=ACCENT, fg=TEXT, width=None, font=None, hover_bg=None):
     kw = dict(width=width) if width else {}
+
+    # default hover selection: accent for primary buttons, subtle gray for surface buttons
+    if hover_bg is None:
+        hover_bg = BORDER if color == SURFACE2 else ACCENT2
+
     b = tk.Button(
-        parent, text=text, command=command,
-        bg=color, fg=fg, disabledforeground=fg,
-        activebackground=ACCENT2, activeforeground=BG,
-        relief="flat", cursor="hand2",
+        parent,
+        text=text,
+        command=command,
+        bg=color,
+        fg=fg,
+        disabledforeground=fg,
+        activebackground=hover_bg,
+        activeforeground=BG,
+        relief="flat",
+        cursor="hand2",
         font=font or FONT_LABEL,
-        padx=12, pady=6,
+        padx=12,
+        pady=6,
         bd=0,
         **kw,
     )
-    # hover effect
-    b.bind("<Enter>", lambda e: b.config(bg=ACCENT2))
-    b.bind("<Leave>", lambda e: b.config(bg=color))
+
+    # closures capture current colors to avoid late-binding issues
+    def _on_enter(event, bg=hover_bg):
+        b.config(bg=bg)
+
+    def _on_leave(event, bg=color):
+        b.config(bg=bg)
+
+    b.bind("<Enter>", _on_enter)
+    b.bind("<Leave>", _on_leave)
     return b
 
 def make_label(parent, text, font=None, fg=TEXT, **kwargs):

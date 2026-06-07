@@ -21,18 +21,18 @@ import winsound
 import tkinter.scrolledtext as scrolledtext
 
 # ── Palette ──────────────────────────────────────────────────────────────────
-BG        = "#0f1117"
-SURFACE   = "#1a1d27"
-SURFACE2  = "#22263a"
-BORDER    = "#2e3250"
-ACCENT    = "#6c8ef5"
-ACCENT2   = "#a78bfa"
-SUCCESS   = "#34d399"
-WARNING   = "#fbbf24"
-DANGER    = "#f87171"
-TEXT      = "#e2e8f0"
-TEXT_MUTED= "#64748b"
-TEXT_DIM  = "#94a3b8"
+BG        = "#f7fafc"
+SURFACE   = "#ffffff"
+SURFACE2  = "#f0f4f8"
+BORDER    = "#e2e8f0"
+ACCENT    = "#2563eb"
+ACCENT2   = "#7c3aed"
+SUCCESS   = "#059669"
+WARNING   = "#b45309"
+DANGER    = "#dc2626"
+TEXT      = "#0f1724"
+TEXT_MUTED= "#475569"
+TEXT_DIM  = "#64748b"
 
 FONT_TITLE  = ("Segoe UI", 18, "bold")
 FONT_SUB    = ("Segoe UI", 10)
@@ -90,7 +90,7 @@ def make_entry(parent, **kwargs):
     )
     return e
 
-def make_button(parent, text, command, color=ACCENT, fg=BG, width=None, font=None):
+def make_button(parent, text, command, color=ACCENT, fg=TEXT, width=None, font=None):
     kw = dict(width=width) if width else {}
     b = tk.Button(
         parent, text=text, command=command,

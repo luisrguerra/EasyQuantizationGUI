@@ -47,13 +47,11 @@ SUPPORTED_MODELS = [
     "SD3",
     "Aurora",
     "HiDream",
-    "Cosmos Predict 2",
     "Hyvid",
     "Wan",
     "LTXV",
     "SDXL",
     "SD1",
-    "Lumina 2",
 ]
 
 QUANTIZE_LEVELS = [

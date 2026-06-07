@@ -17,13 +17,11 @@ This tool supports quantization for a wide range of model architectures commonly
 - SD3
 - Aurora
 - HiDream
-- Cosmos Predict 2
 - Hyvid
 - Wan
 - LTXV
 - SDXL
 - SD1
-- Lumina 2
 
 Usage
 -----

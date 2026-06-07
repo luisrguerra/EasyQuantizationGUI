@@ -1,6 +1,7 @@
 This application basically just simplifies this process: https://github.com/city96/ComfyUI-GGUF/tree/main/tools
 
-<img width="896" height="706" alt="python_FLCpyubOp8" src="https://github.com/user-attachments/assets/3b4f5887-d1eb-46a4-85b4-6a3b2a8f93d1" />
+<img width="899" height="712" alt="explorer_FR8IunMN25" src="https://github.com/user-attachments/assets/0009714d-9419-4745-ac9d-993089f5a007" />
+
 
 Run `EasyQuantizationGUI.bat` to start the application.
 

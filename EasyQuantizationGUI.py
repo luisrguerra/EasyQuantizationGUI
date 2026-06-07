@@ -160,7 +160,7 @@ class EasyQuantGUI:
         header.pack(fill="x")
 
         tk.Label(
-            header, text="⚡  Easy Quantization GUI",
+            header, text="Easy Quantization GUI",
             bg=SURFACE, fg=TEXT, font=FONT_TITLE,
         ).pack(side="left", padx=20)
         tk.Label(

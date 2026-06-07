@@ -315,10 +315,7 @@ class EasyQuantGUI:
         self._section_label(right, "Supported models", bg=SURFACE)
 
         canvas = tk.Canvas(right, bg=SURFACE, highlightthickness=0, bd=0)
-        scrollbar = ttk.Scrollbar(right, orient="vertical", command=canvas.yview)
-        canvas.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-        canvas.pack(side="left", fill="both", expand=True)
+        canvas.pack(fill="both", expand=True)
 
         inner = tk.Frame(canvas, bg=SURFACE)
         win_id = canvas.create_window((0, 0), window=inner, anchor="nw")
@@ -338,9 +335,7 @@ class EasyQuantGUI:
             tk.Label(row, text=name, bg=SURFACE2, fg=TEXT, font=FONT_BODY, anchor="w").pack(side="left", pady=5)
 
         # bind mousewheel
-        def _on_mousewheel(e):
-            canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        # Remove scrollbar: keep simple static layout without scroll controls
 
     # ── Field helper ──────────────────────────────────────────────────────────
     def _field_row(self, parent, label, hint, entry_attr, browse_cmd, browse_attr):

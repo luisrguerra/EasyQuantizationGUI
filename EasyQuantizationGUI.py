@@ -360,19 +360,32 @@ class EasyQuantGUI:
     # ── Quantization hint ────────────────────────────────────────────────────
     def _quant_hint(self, level):
         hints = {
-            "Q2_K": "Smallest · low quality",
-            "Q3_K": "Very small",
-            "Q3_K_M": "Small · medium",
-            "Q4_0": "Small · balanced",
-            "Q4_K": "Good balance",
-            "Q4_K_M": "Good quality ★",
-            "Q4_K_S": "Compact · good",
-            "Q5_K_M": "High quality",
-            "Q6_K": "Near-lossless",
-            "Q8_0": "Best quality ★",
-            "F16": "Full precision",
-            "BF16": "BFloat16",
-            "F32": "Maximum precision",
+            "Q2_K": "Extreme compression — very small size, low accuracy",
+            "Q2_K_S": "Ultra-compact — lowest precision, smallest footprint",
+
+            "Q3_K": "Very small — strong compression, reduced fidelity",
+            "Q3_K_L": "Low-precision 3-bit — smaller size, lower quality",
+            "Q3_K_M": "Medium 3-bit — balanced size vs. quality",
+            "Q3_K_S": "Small 3-bit — slightly better quality than lowest",
+
+            "Q4_0": "4-bit baseline — compact with reasonable accuracy",
+            "Q4_1": "4-bit variant — slightly different trade-offs",
+            "Q4_K": "4-bit k-means — efficient with good accuracy",
+            "Q4_K_M": "4-bit high-quality — improved fidelity",
+            "Q4_K_S": "4-bit small — optimized for minimal size",
+
+            "Q5_0": "5-bit baseline — better fidelity than 4-bit",
+            "Q5_1": "5-bit variant — alternate trade-offs",
+            "Q5_K": "5-bit k-means — higher precision for quality",
+            "Q5_K_M": "5-bit medium — balanced precision and size",
+            "Q5_K_S": "5-bit small — space-optimized 5-bit",
+
+            "Q6_K": "6-bit k-means — near-lossless, high quality",
+            "Q8_0": "8-bit — highest quantized precision, best quality",
+
+            "F16": "Float16 — lower-precision float, good accuracy",
+            "BF16": "BFloat16 — float variant with wide dynamic range",
+            "F32": "Float32 — full precision, no quantization",
         }
         return hints.get(level, "")
 

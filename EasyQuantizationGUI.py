@@ -33,6 +33,7 @@ DANGER    = "#dc2626"
 TEXT      = "#0f1724"
 TEXT_MUTED= "#475569"
 TEXT_DIM  = "#64748b"
+WHITE     = "#ffffff"
 
 FONT_TITLE  = ("Segoe UI", 18, "bold")
 FONT_SUB    = ("Segoe UI", 10)
@@ -94,7 +95,7 @@ def make_button(parent, text, command, color=ACCENT, fg=TEXT, width=None, font=N
     kw = dict(width=width) if width else {}
     b = tk.Button(
         parent, text=text, command=command,
-        bg=color, fg=fg,
+        bg=color, fg=fg, disabledforeground=fg,
         activebackground=ACCENT2, activeforeground=BG,
         relief="flat", cursor="hand2",
         font=font or FONT_LABEL,

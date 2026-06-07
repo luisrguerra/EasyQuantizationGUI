@@ -394,7 +394,7 @@ class EasyQuantGUI:
 
     # ── Browse callbacks ──────────────────────────────────────────────────────
     def _browse_input(self):
-        path = filedialog.askopenfilename(filetypes=[("Model files", "*.safetensors *.gguf *.sft")])
+        path = filedialog.askopenfilename(filetypes=[("Model files", "*.safetensors")])
         if path:
             path = path.replace("\\", "/")
             self.input_entry.delete(0, tk.END)

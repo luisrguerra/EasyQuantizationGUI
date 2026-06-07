@@ -42,17 +42,17 @@ FONT_MONO   = ("Consolas", 9)
 FONT_BADGE  = ("Segoe UI", 8, "bold")
 
 SUPPORTED_MODELS = [
-    ("Flux",            "Diffusion"),
-    ("SD3",             "Diffusion"),
-    ("Aurora",          "Diffusion"),
-    ("HiDream",         "Diffusion"),
-    ("Cosmos Predict 2","Video"),
-    ("Hyvid",           "Video"),
-    ("Wan",             "Video"),
-    ("LTXV",            "Video"),
-    ("SDXL",            "Diffusion"),
-    ("SD1",             "Diffusion"),
-    ("Lumina 2",        "Diffusion"),
+    "Flux",
+    "SD3",
+    "Aurora",
+    "HiDream",
+    "Cosmos Predict 2",
+    "Hyvid",
+    "Wan",
+    "LTXV",
+    "SDXL",
+    "SD1",
+    "Lumina 2",
 ]
 
 QUANTIZE_LEVELS = [
@@ -310,23 +310,11 @@ class EasyQuantGUI:
         inner.bind("<Configure>", on_configure)
         canvas.bind("<Configure>", on_configure)
 
-        category_colors = {"Diffusion": ACCENT, "Video": ACCENT2}
-        last_cat = None
-        for name, cat in SUPPORTED_MODELS:
-            if cat != last_cat:
-                last_cat = cat
-                tk.Label(
-                    inner, text=cat.upper(),
-                    bg=SURFACE, fg=TEXT_MUTED,
-                    font=("Segoe UI", 7, "bold"),
-                    anchor="w",
-                ).pack(fill="x", pady=(10, 2))
-
+        for name in SUPPORTED_MODELS:
             row = tk.Frame(inner, bg=SURFACE2, relief="flat")
             row.pack(fill="x", pady=2)
 
-            dot_color = category_colors.get(cat, ACCENT)
-            tk.Label(row, text="●", bg=SURFACE2, fg=dot_color, font=("Segoe UI", 8)).pack(side="left", padx=(8, 4), pady=5)
+            tk.Label(row, text="●", bg=SURFACE2, fg=ACCENT, font=("Segoe UI", 8)).pack(side="left", padx=(8, 4), pady=5)
             tk.Label(row, text=name, bg=SURFACE2, fg=TEXT, font=FONT_BODY, anchor="w").pack(side="left", pady=5)
 
         # bind mousewheel
